@@ -1,6 +1,6 @@
 /*jshint esversion: 6 */
 // const fs = require('fs');
-var  exports = module.exports = {};
+// var  exports = module.exports = {};
 
 
 let resolvedPath = function(directoryPath,fileName){
@@ -31,20 +31,28 @@ let readDir = function(dirPath){
 };
 
 let readDirFiles = function(dirPath){
-  let foundFiles = [];
+  let filePromises = [];
   readDir(dirPath).then((filesPath) => {
     files.forEach((filePath) => {
-      readFile(resolvedPath(dirPath,filePath)).then((file) => {
-        foundFiles.push(file);
-      });
+      filePromises.push(readFile(resolvedPath(dirPath,filePath)));
     });
+  });
+  Promise.all(filePromises).then((files) => {
+    console.log(files);
+    return files;
   });
   //find some way to resolve all promises
 };
 
-exports = {
-  resolvedPath:resolvedPath,
-  readFile:readFile,
-  readDir:readDir,
-  readDirFiles:readDirFiles
-};
+// exports = {
+//   resolvedPath:resolvedPath,
+//   readFile:readFile,
+//   readDir:readDir,
+//   readDirFiles:readDirFiles
+// };
+
+readFile('./fork.js').then((data) => {
+  console.log(data);
+}).catch((data) => {
+  console.log('error',data);
+});
