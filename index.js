@@ -1,14 +1,14 @@
 /*jshint esversion: 6 */
-// const fs = require('fs');
-// var  exports = module.exports = {};
 
+var path = require('path');
+var fs = require('fs');
 
-let resolvedPath = function(directoryPath,fileName){
-  return directoryPath + fileName;
+exports.resolvedPath = function(directoryPath,fileName){
+  return path.resolve(directoryPath, fileName);
 };
 
 
-let readFile = function(filePath){
+exports.readFile = function(filePath){
   return new Promise(function(resolve,reject){
     fs.readFile(filePath, 'utf8', (err, data) => {
       if (err){
@@ -19,7 +19,7 @@ let readFile = function(filePath){
   });
 };
 
-let readDir = function(dirPath){
+exports.readDir = function(dirPath){
   return new Promise(function(resolve,reject){
     fs.readdir(dirPath, (err, data) => {
       if (err){
@@ -30,29 +30,12 @@ let readDir = function(dirPath){
   });
 };
 
-let readDirFiles = function(dirPath){
-  let filePromises = [];
-  readDir(dirPath).then((filesPath) => {
-    files.forEach((filePath) => {
-      filePromises.push(readFile(resolvedPath(dirPath,filePath)));
+exports.readDirFiles = function(dirPath){
+  var filePromises = [];
+  return exports.readDir(dirPath).then((filesPath) => {
+    filesPath.forEach((filePath) => {
+      filePromises.push(exports.readFile(exports.resolvedPath(dirPath,filePath)));
     });
+    return Promise.all(filePromises);
   });
-  Promise.all(filePromises).then((files) => {
-    console.log(files);
-    return files;
-  });
-  //find some way to resolve all promises
 };
-
-// exports = {
-//   resolvedPath:resolvedPath,
-//   readFile:readFile,
-//   readDir:readDir,
-//   readDirFiles:readDirFiles
-// };
-
-readFile('./fork.js').then((data) => {
-  console.log(data);
-}).catch((data) => {
-  console.log('error',data);
-});
